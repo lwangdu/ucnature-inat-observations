@@ -1,0 +1,311 @@
+.ucnature-inat {
+	--ucnature-inat-accent: #1f5f3b;
+	--ucnature-inat-border: #d7ddd7;
+	--ucnature-inat-muted: #59635b;
+	--ucnature-inat-surface: #fff;
+	margin-block: 2rem 3rem;
+}
+
+.ucnature-inat .screen-reader-text {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+	word-wrap: normal;
+}
+
+.ucnature-inat a:focus-visible {
+	outline: 3px solid var(--ucnature-inat-accent);
+	outline-offset: 3px;
+}
+
+.ucnature-inat__header {
+	border-bottom: 1px solid var(--ucnature-inat-border);
+	margin-block-end: 1.25rem;
+	padding-block-end: 1rem;
+}
+
+.ucnature-inat__title {
+	font-size: clamp(1.75rem, 2vw, 2.35rem);
+	line-height: 1.12;
+	margin-block: 0 0.35rem;
+}
+
+.ucnature-inat__summary {
+	color: #303832;
+	font-size: 1rem;
+	line-height: 1.65;
+	margin-block: 0;
+	max-width: 56rem;
+}
+
+.ucnature-inat__filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.6rem;
+	margin-block: 1.25rem 1.5rem;
+}
+
+.ucnature-inat__filter {
+	border: 1px solid var(--ucnature-inat-border);
+	border-radius: 4px;
+	color: #26332a;
+	display: inline-flex;
+	font-weight: 600;
+	line-height: 1;
+	padding: 0.65rem 0.85rem;
+	text-decoration: none;
+	transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.ucnature-inat__filter.is-active,
+.ucnature-inat__filter:hover,
+.ucnature-inat__filter:focus {
+	background: var(--ucnature-inat-accent);
+	border-color: var(--ucnature-inat-accent);
+	color: #fff;
+}
+
+.ucnature-inat-stats {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+	margin-block: 0 1.5rem;
+}
+
+.ucnature-inat-stats__card {
+	background: #f6f6f6;
+	border-radius: 8px;
+	padding: 1.25rem;
+}
+
+.ucnature-inat-stats__card--source {
+	background: #edf6fc;
+}
+
+.ucnature-inat-stats__eyebrow {
+	color: #4f5550;
+	font-size: 0.78rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	margin: 0 0 0.9rem;
+	text-transform: uppercase;
+}
+
+.ucnature-inat-stats__card--source .ucnature-inat-stats__eyebrow {
+	color: #174b70;
+}
+
+.ucnature-inat-stats__metrics {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem 2rem;
+	justify-content: center;
+}
+
+.ucnature-inat-stats__metric {
+	min-width: 5rem;
+	text-align: center;
+}
+
+.ucnature-inat-stats__metric strong {
+	color: #236fa6;
+	display: block;
+	font-size: 1.75rem;
+	font-weight: 700;
+	line-height: 1.1;
+}
+
+.ucnature-inat-stats__metric span {
+	color: #4f5550;
+	display: block;
+	font-size: 0.78rem;
+	letter-spacing: 0.04em;
+	margin-block-start: 0.2rem;
+	text-transform: uppercase;
+}
+
+.ucnature-inat-stats__link {
+	color: #176ca8;
+	display: block;
+	font-weight: 700;
+	margin-block-start: 1rem;
+	text-align: center;
+	text-decoration: none;
+}
+
+.ucnature-inat-stats__link:hover,
+.ucnature-inat-stats__link:focus {
+	text-decoration: underline;
+	text-underline-offset: 0.16em;
+}
+
+.ucnature-inat__grid {
+	display: grid;
+	gap: 1.25rem;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+}
+
+.ucnature-inat-pagination {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem 1rem;
+	justify-content: space-between;
+	margin-block-start: 2rem;
+}
+
+.ucnature-inat-pagination__summary {
+	color: var(--ucnature-inat-muted);
+	font-size: 0.95rem;
+	margin: 0;
+}
+
+.ucnature-inat-pagination__links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+}
+
+.ucnature-inat-pagination__link,
+.ucnature-inat-pagination__ellipsis {
+	align-items: center;
+	border: 1px solid var(--ucnature-inat-border);
+	border-radius: 4px;
+	color: #26332a;
+	display: inline-flex;
+	font-weight: 700;
+	justify-content: center;
+	min-height: 2.25rem;
+	min-width: 2.25rem;
+	padding: 0.45rem 0.7rem;
+	text-decoration: none;
+}
+
+.ucnature-inat-pagination__link:hover,
+.ucnature-inat-pagination__link:focus,
+.ucnature-inat-pagination__link.is-current {
+	background: var(--ucnature-inat-accent);
+	border-color: var(--ucnature-inat-accent);
+	color: #fff;
+}
+
+.ucnature-inat-pagination__ellipsis {
+	border-color: transparent;
+	color: var(--ucnature-inat-muted);
+}
+
+.ucnature-inat-card {
+	background: var(--ucnature-inat-surface);
+	border: 1px solid var(--ucnature-inat-border);
+	border-radius: 4px;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	overflow: hidden;
+}
+
+.ucnature-inat-card__media {
+	aspect-ratio: 4 / 3;
+	background: #eef2ee;
+	color: inherit;
+	display: grid;
+	flex: 0 0 auto;
+	height: 220px;
+	overflow: hidden;
+	place-items: center;
+	text-decoration: none;
+	width: 100%;
+}
+
+.ucnature-inat-card__media img {
+	display: block;
+	height: 100%;
+	max-width: none;
+	object-fit: cover;
+	object-position: center;
+	width: 100%;
+}
+
+.ucnature-inat-card__placeholder {
+	color: #4f5f52;
+	font-weight: 700;
+}
+
+.ucnature-inat-card__body {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	padding: 1rem;
+}
+
+.ucnature-inat-card__group {
+	align-self: flex-start;
+	background: var(--ucnature-inat-accent);
+	border-radius: 999px;
+	color: #fff;
+	font-size: 0.78rem;
+	font-weight: 700;
+	line-height: 1;
+	letter-spacing: 0;
+	margin: 0 0 0.75rem;
+	padding: 0.38rem 0.75rem;
+	text-transform: uppercase;
+}
+
+.ucnature-inat-card__name {
+	font-size: 1.125rem;
+	line-height: 1.25;
+	margin-block: 0 0.25rem;
+}
+
+.ucnature-inat-card__name a {
+	color: inherit;
+	font-weight: 700;
+	text-decoration-thickness: 0.08em;
+	text-underline-offset: 0.16em;
+}
+
+.ucnature-inat-card__scientific {
+	color: #303832;
+	font-size: 0.95rem;
+	margin-block: 0 1.55rem;
+}
+
+.ucnature-inat-card__meta {
+	color: var(--ucnature-inat-muted);
+	display: grid;
+	font-size: 0.95rem;
+	gap: 0.25rem;
+	margin: 0;
+}
+
+.ucnature-inat-card__meta p {
+	color: var(--ucnature-inat-muted);
+	margin: 0;
+}
+
+.ucnature-inat-card__grade {
+	color: var(--ucnature-inat-accent);
+	font-size: 1.125rem;
+	font-weight: 700;
+	line-height: 1.25;
+	margin: 0.9rem 0 0;
+}
+
+.ucnature-inat__notice {
+	background: #f6f8f6;
+	border-left: 4px solid var(--ucnature-inat-accent);
+	padding: 1rem;
+}
+
+@media (max-width: 480px) {
+	.ucnature-inat-card__media {
+		height: 200px;
+	}
+}
