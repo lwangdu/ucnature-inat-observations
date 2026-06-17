@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-final class UCNature_iNat_Observations_REST {
+final class UCNature_INat_Observations_REST {
 	public function __construct() {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
@@ -44,7 +44,7 @@ final class UCNature_iNat_Observations_REST {
 						'default'           => 100,
 						'sanitize_callback' => 'absint',
 						'minimum'           => 1,
-						'maximum'           => UCNature_iNat_Observations_Cache::MAX_PER_PAGE,
+						'maximum'           => UCNature_INat_Observations_Cache::MAX_PER_PAGE,
 					),
 					'page'         => array(
 						'type'              => 'integer',
@@ -55,7 +55,7 @@ final class UCNature_iNat_Observations_REST {
 					'group'        => array(
 						'type'              => 'string',
 						'default'           => '',
-						'sanitize_callback' => array( 'UCNature_iNat_Observations_Cache', 'sanitize_group' ),
+						'sanitize_callback' => array( 'UCNature_INat_Observations_Cache', 'sanitize_group' ),
 					),
 				),
 			)
@@ -63,7 +63,7 @@ final class UCNature_iNat_Observations_REST {
 	}
 
 	public function get_observations( WP_REST_Request $request ) {
-		$data = UCNature_iNat_Observations_Cache::get_observations(
+		$data = UCNature_INat_Observations_Cache::get_observations(
 			array(
 				'project_id'   => $request->get_param( 'project_id' ),
 				'project_slug' => $request->get_param( 'project_slug' ),

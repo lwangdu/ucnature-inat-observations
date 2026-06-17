@@ -20,9 +20,11 @@ $quality_label = 'research' === $observation['quality_grade']
 			<p class="ucnature-inat-card__group"><?php echo esc_html( $observation['taxon_group'] ); ?></p>
 		<?php endif; ?>
 		<h3 class="ucnature-inat-card__name">
-			<a href="<?php echo esc_url( $observation['url'] ); ?>" target="_blank" rel="noopener noreferrer">
+			<a href="<?php echo esc_url( $observation['url'] ); ?>"<?php echo $open_links_in_new_tab ? ' target="_blank" rel="noopener noreferrer"' : ''; ?>>
 				<?php echo esc_html( $observation['common_name'] ); ?>
-				<span class="screen-reader-text"> <?php esc_html_e( 'opens in a new tab', 'ucnature-inat-observations' ); ?></span>
+				<?php if ( $open_links_in_new_tab ) : ?>
+					<span class="screen-reader-text"> <?php esc_html_e( 'opens in a new tab', 'ucnature-inat-observations' ); ?></span>
+				<?php endif; ?>
 			</a>
 		</h3>
 		<?php if ( $observation['scientific_name'] ) : ?>

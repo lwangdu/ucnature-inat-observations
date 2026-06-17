@@ -3,10 +3,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-final class UCNature_iNat_Observations_Cache {
+final class UCNature_INat_Observations_Cache {
 	const API_BASE          = 'https://api.inaturalist.org/v1/observations';
 	const PROJECTS_API_BASE = 'https://api.inaturalist.org/v1/projects';
-	const MAX_PER_PAGE     = 200;
+	const PLACES_API_BASE   = 'https://api.inaturalist.org/v1/places';
+	const MAX_PER_PAGE      = 200;
 
 	public function __construct() {}
 
@@ -38,7 +39,7 @@ final class UCNature_iNat_Observations_Cache {
 	}
 
 	public static function get_observations( $args = array() ) {
-		$options = UCNature_iNat_Observations_Admin::get_options();
+		$options = UCNature_INat_Observations_Admin::get_options();
 		$args    = self::normalize_query_args( $args, $options );
 		$args    = self::resolve_project_slug_arg( $args );
 
@@ -46,8 +47,8 @@ final class UCNature_iNat_Observations_Cache {
 			return $args;
 		}
 
-		$cache_key = 'ucnature_inat_v2_' . md5( wp_json_encode( $args ) );
-		$cached     = get_transient( $cache_key );
+		$cache_key = 'ucnature_inat_v3_' . md5( wp_json_encode( $args ) );
+		$cached    = get_transient( $cache_key );
 
 		if ( false !== $cached ) {
 			return $cached;
@@ -58,9 +59,9 @@ final class UCNature_iNat_Observations_Cache {
 			array(
 				'per_page' => $args['per_page'],
 				'page'     => $args['page'],
-				'photos'     => 'true',
-				'order'      => 'desc',
-				'order_by'   => 'observed_on',
+				'photos'   => 'true',
+				'order'    => 'desc',
+				'order_by' => 'observed_on',
 			)
 		);
 
@@ -108,7 +109,7 @@ final class UCNature_iNat_Observations_Cache {
 	}
 
 	public static function get_source_stats( $args = array() ) {
-		$options = UCNature_iNat_Observations_Admin::get_options();
+		$options = UCNature_INat_Observations_Admin::get_options();
 		$args    = self::normalize_query_args( $args, $options );
 		$args    = self::resolve_project_slug_arg( $args );
 
@@ -116,10 +117,16 @@ final class UCNature_iNat_Observations_Cache {
 			return $args;
 		}
 
-		$cache_key = 'ucnature_inat_stats_v1_' . md5( wp_json_encode( $args ) );
+		$cache_key = 'ucnature_inat_stats_v2_' . md5( wp_json_encode( $args ) );
 		$cached    = get_transient( $cache_key );
 
 		if ( false !== $cached ) {
+			if ( ! is_array( $cached ) ) {
+				return array(
+					'id' => absint( $cached ),
+				);
+			}
+
 			return $cached;
 		}
 
@@ -156,6 +163,7 @@ final class UCNature_iNat_Observations_Cache {
 			'identifiers'  => $identifiers,
 			'observers'    => $observers,
 			'url'          => self::inat_url( $args ),
+			'label'        => self::source_label( $args ),
 		);
 
 		set_transient( $cache_key, $result, absint( $options['cache_ttl'] ) );
@@ -163,9 +171,21 @@ final class UCNature_iNat_Observations_Cache {
 		return $result;
 	}
 
+	public static function clear_cache() {
+		global $wpdb;
+
+		$deleted = $wpdb->query(
+			"DELETE FROM {$wpdb->options}
+			WHERE option_name LIKE '_transient_ucnature_inat_%'
+			OR option_name LIKE '_transient_timeout_ucnature_inat_%'"
+		);
+
+		return false === $deleted ? 0 : absint( $deleted );
+	}
+
 	public static function displayed_stats( $data ) {
-		$results = $data['results'] ?? array();
-		$species = array();
+		$results   = $data['results'] ?? array();
+		$species   = array();
 		$observers = array();
 
 		foreach ( $results as $observation ) {
@@ -256,15 +276,44 @@ final class UCNature_iNat_Observations_Cache {
 	}
 
 	private static function project_id_from_slug( $project_slug ) {
+		$project = self::project_from_slug( $project_slug );
+
+		if ( is_wp_error( $project ) ) {
+			return $project;
+		}
+
+		return absint( $project['id'] ?? 0 );
+	}
+
+	private static function project_from_slug( $project_slug ) {
 		$cache_key = 'ucnature_inat_project_slug_' . md5( $project_slug );
 		$cached    = get_transient( $cache_key );
 
 		if ( false !== $cached ) {
-			return absint( $cached );
+			return $cached;
 		}
 
+		$data = self::request_json( trailingslashit( self::PROJECTS_API_BASE ) . rawurlencode( $project_slug ) );
+		if ( is_wp_error( $data ) ) {
+			return $data;
+		}
+
+		$project = $data['results'][0] ?? array();
+		if ( empty( $project['id'] ) ) {
+			return new WP_Error(
+				'ucnature_inat_project_not_found',
+				__( 'The iNaturalist project slug was not found.', 'ucnature-inat-observations' )
+			);
+		}
+
+		set_transient( $cache_key, $project, DAY_IN_SECONDS );
+
+		return $project;
+	}
+
+	private static function request_json( $url ) {
 		$response = wp_remote_get(
-			trailingslashit( self::PROJECTS_API_BASE ) . rawurlencode( $project_slug ),
+			$url,
 			array(
 				'timeout'     => 12,
 				'redirection' => 2,
@@ -279,29 +328,22 @@ final class UCNature_iNat_Observations_Cache {
 		$status = wp_remote_retrieve_response_code( $response );
 		if ( 200 !== $status ) {
 			return new WP_Error(
-				'ucnature_inat_project_error',
+				'ucnature_inat_api_error',
 				sprintf(
 					/* translators: %d: HTTP status code. */
-					__( 'iNaturalist project lookup returned HTTP %d.', 'ucnature-inat-observations' ),
+					__( 'iNaturalist returned HTTP %d.', 'ucnature-inat-observations' ),
 					$status
 				)
 			);
 		}
 
-		$data    = json_decode( wp_remote_retrieve_body( $response ), true );
-		$project = $data['results'][0] ?? array();
+		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		if ( empty( $project['id'] ) ) {
-			return new WP_Error(
-				'ucnature_inat_project_not_found',
-				__( 'The iNaturalist project slug was not found.', 'ucnature-inat-observations' )
-			);
+		if ( ! is_array( $data ) ) {
+			return new WP_Error( 'ucnature_inat_bad_response', __( 'The iNaturalist response was not readable.', 'ucnature-inat-observations' ) );
 		}
 
-		$project_id = absint( $project['id'] );
-		set_transient( $cache_key, $project_id, DAY_IN_SECONDS );
-
-		return $project_id;
+		return $data;
 	}
 
 	private static function source_query_args( $args ) {
@@ -357,6 +399,63 @@ final class UCNature_iNat_Observations_Cache {
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		return absint( $data['total_results'] ?? 0 );
+	}
+
+	private static function source_label( $args ) {
+		if ( '' !== $args['project_slug'] ) {
+			$project = self::project_from_slug( $args['project_slug'] );
+
+			if ( ! is_wp_error( $project ) && ! empty( $project['title'] ) ) {
+				return sanitize_text_field( $project['title'] );
+			}
+		}
+
+		if ( $args['project_id'] ) {
+			$label = self::entity_label( trailingslashit( self::PROJECTS_API_BASE ) . absint( $args['project_id'] ), 'title' );
+
+			if ( '' !== $label ) {
+				return $label;
+			}
+		}
+
+		if ( $args['place_id'] ) {
+			$label = self::entity_label( trailingslashit( self::PLACES_API_BASE ) . absint( $args['place_id'] ), 'display_name' );
+
+			if ( '' !== $label ) {
+				return $label;
+			}
+		}
+
+		if ( '' !== $args['user_id'] ) {
+			return sprintf(
+				/* translators: %s: iNaturalist user ID or login. */
+				__( 'iNaturalist user %s', 'ucnature-inat-observations' ),
+				$args['user_id']
+			);
+		}
+
+		return __( 'iNaturalist', 'ucnature-inat-observations' );
+	}
+
+	private static function entity_label( $url, $field ) {
+		$cache_key = 'ucnature_inat_label_' . md5( $url . '|' . $field );
+		$cached    = get_transient( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$data = self::request_json( $url );
+		if ( is_wp_error( $data ) ) {
+			return '';
+		}
+
+		$entity = $data['results'][0] ?? $data;
+		$label  = sanitize_text_field( $entity[ $field ] ?? $entity['name'] ?? $entity['title'] ?? '' );
+
+		set_transient( $cache_key, $label, DAY_IN_SECONDS );
+
+		return $label;
 	}
 
 	private static function inat_url( $args ) {

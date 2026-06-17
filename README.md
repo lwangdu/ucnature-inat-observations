@@ -10,6 +10,9 @@ A small WordPress plugin for displaying live iNaturalist observations on UC Natu
 - Filters for all observations, birds, mammals, plants, insects, and fungi.
 - Stats cards for observations shown on the current page and all-time source totals.
 - Pagination for larger projects, with 100 observations per page by default.
+- Reserve presets for Stunt Ranch, Blue Oak Ranch Reserve, Sagehen Creek Basin, and Sage Hill at UCLA.
+- Optional setting for opening iNaturalist links in a new tab.
+- Admin cache clearing for refreshing stale iNaturalist data.
 - Cached iNaturalist API requests to reduce page-load and API pressure.
 - Legacy shortcode support via `[ucnature_inat_observations]`.
 
@@ -20,11 +23,13 @@ A small WordPress plugin for displaying live iNaturalist observations on UC Natu
 3. Add the `iNaturalist Observations` block.
 4. Use the WordPress page title and a normal paragraph block for the page heading and intro text.
 5. Configure the iNaturalist source in the block sidebar:
+   - `Reserve preset` for common UC Nature iNaturalist sources.
    - `Project slug` for an iNaturalist project slug.
    - `Project ID fallback` when a numeric project ID is needed.
    - `Place ID` for reserve boundary-based feeds.
    - `User ID or login` for account-based feeds.
    - `Observations per page` for pagination size.
+   - `Open iNaturalist links in a new tab` for per-block link behavior.
 
 The plugin creates a starter `iNaturalist Observations` page on activation if one does not already exist.
 
@@ -35,6 +40,8 @@ Global defaults are available under:
 `Settings > iNaturalist Observations`
 
 These defaults are used by the block and shortcode unless page-specific block settings override them.
+
+Use `Clear iNaturalist cache` on the settings page when source settings change or when cached observations need to refresh immediately.
 
 ## Accessibility
 
@@ -50,22 +57,26 @@ Result: no issues found.
 
 ## Development Checks
 
+Install development dependencies:
+
+```sh
+composer install
+```
+
 Run PHP syntax checks:
 
 ```sh
-find . -name '*.php' -print -exec php -l {} \;
+composer lint:php
 ```
 
 Run JavaScript syntax check:
 
 ```sh
-node --check assets/js/block.js
+composer lint:js
 ```
 
-For automated WordPress Coding Standards checks, install WordPressCS and run:
+Run automated WordPress Coding Standards checks with the `WordPress-Core` ruleset:
 
 ```sh
-phpcs --standard=WordPress --extensions=php .
+composer phpcs
 ```
-
-In the current local environment, PHPCS is installed but the `WordPress` standard is not installed.

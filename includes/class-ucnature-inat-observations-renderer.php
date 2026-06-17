@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-final class UCNature_iNat_Observations_Renderer {
+final class UCNature_INat_Observations_Renderer {
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_assets' ), 5 );
 		add_action( 'init', array( $this, 'register_block' ) );
@@ -20,7 +20,7 @@ final class UCNature_iNat_Observations_Renderer {
 	}
 
 	public function register_block() {
-		$options = UCNature_iNat_Observations_Admin::get_options();
+		$options = UCNature_INat_Observations_Admin::get_options();
 
 		wp_register_script(
 			'ucnature-inat-observations-block',
@@ -33,7 +33,9 @@ final class UCNature_iNat_Observations_Renderer {
 			'ucnature-inat-observations-block',
 			'window.ucnatureINatObservations = ' . wp_json_encode(
 				array(
-					'maxPerPage' => UCNature_iNat_Observations_Cache::MAX_PER_PAGE,
+					'maxPerPage'        => UCNature_INat_Observations_Cache::MAX_PER_PAGE,
+					'openLinksInNewTab' => ! empty( $options['open_new_tab'] ),
+					'presets'           => $this->source_presets(),
 				)
 			) . ';',
 			'before'
@@ -47,31 +49,39 @@ final class UCNature_iNat_Observations_Renderer {
 				'style'           => 'ucnature-inat-observations',
 				'render_callback' => array( $this, 'render_block' ),
 				'attributes'      => array(
-					'projectId'   => array(
+					'projectId'         => array(
 						'type'    => 'number',
 						'default' => absint( $options['project_id'] ),
 					),
-					'projectSlug' => array(
+					'projectSlug'       => array(
 						'type'    => 'string',
 						'default' => $options['project_slug'],
 					),
-					'placeId'     => array(
+					'placeId'           => array(
 						'type'    => 'number',
 						'default' => 0,
 					),
-					'userId'      => array(
+					'userId'            => array(
 						'type'    => 'string',
 						'default' => '',
 					),
-					'perPage'     => array(
+					'perPage'           => array(
 						'type'    => 'number',
 						'default' => absint( $options['per_page'] ),
 					),
-					'title'       => array(
+					'openLinksInNewTab' => array(
+						'type'    => 'boolean',
+						'default' => ! empty( $options['open_new_tab'] ),
+					),
+					'sourcePreset'      => array(
+						'type'    => 'string',
+						'default' => 'stunt-ranch',
+					),
+					'title'             => array(
 						'type'    => 'string',
 						'default' => '',
 					),
-					'summary'     => array(
+					'summary'           => array(
 						'type'    => 'string',
 						'default' => '',
 					),
@@ -81,7 +91,7 @@ final class UCNature_iNat_Observations_Renderer {
 	}
 
 	public function render_shortcode( $atts ) {
-		$options = UCNature_iNat_Observations_Admin::get_options();
+		$options = UCNature_INat_Observations_Admin::get_options();
 		$atts    = shortcode_atts(
 			array(
 				'project_id'   => $options['project_id'],
@@ -89,6 +99,7 @@ final class UCNature_iNat_Observations_Renderer {
 				'place_id'     => 0,
 				'user_id'      => '',
 				'per_page'     => $options['per_page'],
+				'open_links'   => ! empty( $options['open_new_tab'] ),
 				'title'        => __( 'iNaturalist Observations', 'ucnature-inat-observations' ),
 				'summary'      => __( 'Live observations from this reserve on iNaturalist.', 'ucnature-inat-observations' ),
 			),
@@ -103,6 +114,7 @@ final class UCNature_iNat_Observations_Renderer {
 				'place_id'     => $atts['place_id'],
 				'user_id'      => $atts['user_id'],
 				'per_page'     => $atts['per_page'],
+				'open_links'   => $atts['open_links'],
 				'title'        => $atts['title'],
 				'summary'      => $atts['summary'],
 			)
@@ -117,6 +129,7 @@ final class UCNature_iNat_Observations_Renderer {
 				'place_id'     => $attributes['placeId'] ?? 0,
 				'user_id'      => $attributes['userId'] ?? '',
 				'per_page'     => $attributes['perPage'] ?? 100,
+				'open_links'   => $attributes['openLinksInNewTab'] ?? UCNature_INat_Observations_Admin::get_options()['open_new_tab'],
 				'title'        => $attributes['title'] ?? '',
 				'summary'      => $attributes['summary'] ?? '',
 			)
@@ -126,7 +139,7 @@ final class UCNature_iNat_Observations_Renderer {
 	private function render( $args ) {
 		wp_enqueue_style( 'ucnature-inat-observations' );
 
-		$group      = UCNature_iNat_Observations_Cache::sanitize_group( wp_unslash( $_GET['ucnature_inat_group'] ?? '' ) );
+		$group      = UCNature_INat_Observations_Cache::sanitize_group( wp_unslash( $_GET['ucnature_inat_group'] ?? '' ) );
 		$page       = max( 1, absint( wp_unslash( $_GET['ucnature_inat_page'] ?? 1 ) ) );
 		$query_args = array(
 			'project_id'   => $args['project_id'],
@@ -137,15 +150,16 @@ final class UCNature_iNat_Observations_Renderer {
 			'page'         => $page,
 			'group'        => $group,
 		);
-		$data       = UCNature_iNat_Observations_Cache::get_observations( $query_args );
+		$data       = UCNature_INat_Observations_Cache::get_observations( $query_args );
 
-		$heading_id = wp_unique_id( 'ucnature-inat-heading-' );
-		$title      = sanitize_text_field( $args['title'] );
-		$summary    = sanitize_text_field( $args['summary'] );
-		$has_header = '' !== $title || '' !== $summary;
-		$labelledby = '' !== $title ? ' aria-labelledby="' . esc_attr( $heading_id ) . '"' : '';
-		$stats_title = '' !== $title ? $title : __( 'iNaturalist', 'ucnature-inat-observations' );
-		$stats      = is_wp_error( $data ) ? null : UCNature_iNat_Observations_Cache::get_source_stats( $query_args );
+		$heading_id            = wp_unique_id( 'ucnature-inat-heading-' );
+		$title                 = sanitize_text_field( $args['title'] );
+		$summary               = sanitize_text_field( $args['summary'] );
+		$has_header            = '' !== $title || '' !== $summary;
+		$labelledby            = '' !== $title ? ' aria-labelledby="' . esc_attr( $heading_id ) . '"' : '';
+		$stats                 = is_wp_error( $data ) ? null : UCNature_INat_Observations_Cache::get_source_stats( $query_args );
+		$stats_title           = ! is_wp_error( $stats ) && ! empty( $stats['label'] ) ? $stats['label'] : __( 'iNaturalist', 'ucnature-inat-observations' );
+		$open_links_in_new_tab = ! in_array( $args['open_links'], array( false, 0, '0', 'false', 'no', 'off' ), true );
 
 		ob_start();
 		?>
@@ -165,7 +179,7 @@ final class UCNature_iNat_Observations_Renderer {
 			<?php elseif ( empty( $data['results'] ) ) : ?>
 				<p class="ucnature-inat__notice"><?php esc_html_e( 'No observations found for this filter.', 'ucnature-inat-observations' ); ?></p>
 			<?php else : ?>
-				<?php $this->render_stats_cards( UCNature_iNat_Observations_Cache::displayed_stats( $data ), $stats, $stats_title ); ?>
+				<?php $this->render_stats_cards( UCNature_INat_Observations_Cache::displayed_stats( $data ), $stats, $stats_title, $open_links_in_new_tab ); ?>
 				<?php $this->render_filters( $group ); ?>
 				<div class="ucnature-inat__grid">
 					<?php foreach ( $data['results'] as $observation ) : ?>
@@ -180,7 +194,7 @@ final class UCNature_iNat_Observations_Renderer {
 		return ob_get_clean();
 	}
 
-	private function render_stats_cards( $displayed_stats, $source_stats, $title ) {
+	private function render_stats_cards( $displayed_stats, $source_stats, $title, $open_links_in_new_tab ) {
 		?>
 		<div class="ucnature-inat-stats" aria-label="<?php esc_attr_e( 'iNaturalist observation summary', 'ucnature-inat-observations' ); ?>">
 			<div class="ucnature-inat-stats__card">
@@ -210,10 +224,12 @@ final class UCNature_iNat_Observations_Renderer {
 						<?php $this->render_stat_metric( $source_stats['observers'], __( 'Observers', 'ucnature-inat-observations' ) ); ?>
 					</div>
 					<?php if ( ! empty( $source_stats['url'] ) ) : ?>
-						<a class="ucnature-inat-stats__link" href="<?php echo esc_url( $source_stats['url'] ); ?>" target="_blank" rel="noopener noreferrer">
+						<a class="ucnature-inat-stats__link" href="<?php echo esc_url( $source_stats['url'] ); ?>"<?php echo $open_links_in_new_tab ? ' target="_blank" rel="noopener noreferrer"' : ''; ?>>
 							<?php esc_html_e( 'View full project on iNaturalist', 'ucnature-inat-observations' ); ?>
 							<span aria-hidden="true">→</span>
-							<span class="screen-reader-text"> <?php esc_html_e( 'opens in a new tab', 'ucnature-inat-observations' ); ?></span>
+							<?php if ( $open_links_in_new_tab ) : ?>
+								<span class="screen-reader-text"> <?php esc_html_e( 'opens in a new tab', 'ucnature-inat-observations' ); ?></span>
+							<?php endif; ?>
 						</a>
 					<?php endif; ?>
 				</div>
@@ -302,7 +318,7 @@ final class UCNature_iNat_Observations_Renderer {
 	private function render_filters( $active_group ) {
 		?>
 		<nav class="ucnature-inat__filters" aria-label="<?php esc_attr_e( 'Observation filters', 'ucnature-inat-observations' ); ?>">
-			<?php foreach ( UCNature_iNat_Observations_Cache::group_options() as $group => $label ) : ?>
+			<?php foreach ( UCNature_INat_Observations_Cache::group_options() as $group => $label ) : ?>
 				<?php
 				$url = remove_query_arg( array( 'ucnature_inat_group', 'ucnature_inat_page' ) );
 				if ( '' !== $group ) {
@@ -315,5 +331,50 @@ final class UCNature_iNat_Observations_Renderer {
 			<?php endforeach; ?>
 		</nav>
 		<?php
+	}
+
+	private function source_presets() {
+		return array(
+			array(
+				'label'       => __( 'Custom', 'ucnature-inat-observations' ),
+				'value'       => '',
+				'projectSlug' => '',
+				'projectId'   => 0,
+				'placeId'     => 0,
+				'userId'      => '',
+			),
+			array(
+				'label'       => __( 'Stunt Ranch Santa Monica Mountains Reserve', 'ucnature-inat-observations' ),
+				'value'       => 'stunt-ranch',
+				'projectSlug' => 'stunt-ranch-santa-monica-mountains-reserve',
+				'projectId'   => 3234,
+				'placeId'     => 4169,
+				'userId'      => '',
+			),
+			array(
+				'label'       => __( 'Blue Oak Ranch Reserve Biodiversity', 'ucnature-inat-observations' ),
+				'value'       => 'blue-oak-ranch',
+				'projectSlug' => 'blue-oak-ranch-reserve-biodiversity',
+				'projectId'   => 1697,
+				'placeId'     => 62575,
+				'userId'      => '',
+			),
+			array(
+				'label'       => __( 'Sagehen Creek Basin Biodiversity', 'ucnature-inat-observations' ),
+				'value'       => 'sagehen-creek',
+				'projectSlug' => 'sagehen-creek-basin-biodiversity',
+				'projectId'   => 138,
+				'placeId'     => 50668,
+				'userId'      => '',
+			),
+			array(
+				'label'       => __( 'Sage Hill at UCLA', 'ucnature-inat-observations' ),
+				'value'       => 'sage-hill',
+				'projectSlug' => 'sage-hill-at-ucla',
+				'projectId'   => 7238,
+				'placeId'     => 110507,
+				'userId'      => '',
+			),
+		);
 	}
 }
