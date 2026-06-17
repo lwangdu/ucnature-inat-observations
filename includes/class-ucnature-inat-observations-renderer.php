@@ -35,7 +35,6 @@ final class UCNature_INat_Observations_Renderer {
 				array(
 					'maxPerPage'        => UCNature_INat_Observations_Cache::MAX_PER_PAGE,
 					'openLinksInNewTab' => ! empty( $options['open_new_tab'] ),
-					'presets'           => $this->source_presets(),
 				)
 			) . ';',
 			'before'
@@ -72,10 +71,6 @@ final class UCNature_INat_Observations_Renderer {
 					'openLinksInNewTab' => array(
 						'type'    => 'boolean',
 						'default' => ! empty( $options['open_new_tab'] ),
-					),
-					'sourcePreset'      => array(
-						'type'    => 'string',
-						'default' => 'stunt-ranch',
 					),
 					'title'             => array(
 						'type'    => 'string',
@@ -331,50 +326,5 @@ final class UCNature_INat_Observations_Renderer {
 			<?php endforeach; ?>
 		</nav>
 		<?php
-	}
-
-	private function source_presets() {
-		return array(
-			array(
-				'label'       => __( 'Custom', 'ucnature-inat-observations' ),
-				'value'       => '',
-				'projectSlug' => '',
-				'projectId'   => 0,
-				'placeId'     => 0,
-				'userId'      => '',
-			),
-			array(
-				'label'       => __( 'Stunt Ranch Santa Monica Mountains Reserve', 'ucnature-inat-observations' ),
-				'value'       => 'stunt-ranch',
-				'projectSlug' => 'stunt-ranch-santa-monica-mountains-reserve',
-				'projectId'   => 3234,
-				'placeId'     => 4169,
-				'userId'      => '',
-			),
-			array(
-				'label'       => __( 'Blue Oak Ranch Reserve Biodiversity', 'ucnature-inat-observations' ),
-				'value'       => 'blue-oak-ranch',
-				'projectSlug' => 'blue-oak-ranch-reserve-biodiversity',
-				'projectId'   => 1697,
-				'placeId'     => 62575,
-				'userId'      => '',
-			),
-			array(
-				'label'       => __( 'Sagehen Creek Basin Biodiversity', 'ucnature-inat-observations' ),
-				'value'       => 'sagehen-creek',
-				'projectSlug' => 'sagehen-creek-basin-biodiversity',
-				'projectId'   => 138,
-				'placeId'     => 50668,
-				'userId'      => '',
-			),
-			array(
-				'label'       => __( 'Sage Hill at UCLA', 'ucnature-inat-observations' ),
-				'value'       => 'sage-hill',
-				'projectSlug' => 'sage-hill-at-ucla',
-				'projectId'   => 7238,
-				'placeId'     => 110507,
-				'userId'      => '',
-			),
-		);
 	}
 }

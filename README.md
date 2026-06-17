@@ -10,7 +10,6 @@ A small WordPress plugin for displaying live iNaturalist observations on UC Natu
 - Filters for all observations, birds, mammals, plants, insects, and fungi.
 - Stats cards for observations shown on the current page and all-time source totals.
 - Pagination for larger projects, with 100 observations per page by default.
-- Reserve presets for Stunt Ranch, Blue Oak Ranch Reserve, Sagehen Creek Basin, and Sage Hill at UCLA.
 - Optional setting for opening iNaturalist links in a new tab.
 - Admin cache clearing for refreshing stale iNaturalist data.
 - Cached iNaturalist API requests to reduce page-load and API pressure.
@@ -23,7 +22,6 @@ A small WordPress plugin for displaying live iNaturalist observations on UC Natu
 3. Add the `iNaturalist Observations` block.
 4. Use the WordPress page title and a normal paragraph block for the page heading and intro text.
 5. Configure the iNaturalist source in the block sidebar:
-   - `Reserve preset` for common UC Nature iNaturalist sources.
    - `Project slug` for an iNaturalist project slug.
    - `Project ID fallback` when a numeric project ID is needed.
    - `Place ID` for reserve boundary-based feeds.
