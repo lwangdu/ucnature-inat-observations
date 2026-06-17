@@ -2,7 +2,7 @@
 /**
  * Plugin Name: UC Nature iNaturalist Observations
  * Description: Displays iNaturalist project observations in WordPress using cached API requests and a block editor interface.
- * Version: 0.1.0
+ * Version: 0.1.1
  * Author: Lobsang Wangdu
  * License: GPL-2.0-or-later
  * Text Domain: ucnature-inat-observations
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'UCNATURE_INAT_VERSION', '0.1.0' );
+define( 'UCNATURE_INAT_VERSION', '0.1.1' );
 define( 'UCNATURE_INAT_PATH', plugin_dir_path( __FILE__ ) );
 define( 'UCNATURE_INAT_URL', plugin_dir_url( __FILE__ ) );
 define( 'UCNATURE_INAT_PAGE_OPTION', 'ucnature_inat_observations_page_id' );
