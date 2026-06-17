@@ -18,7 +18,8 @@ A small WordPress plugin for displaying live iNaturalist observations on UC Natu
 1. Activate the plugin in WordPress.
 2. Open or create an `iNaturalist Observations` page.
 3. Add the `iNaturalist Observations` block.
-4. Configure the source in the block sidebar:
+4. Use the WordPress page title and a normal paragraph block for the page heading and intro text.
+5. Configure the iNaturalist source in the block sidebar:
    - `Project slug` for an iNaturalist project slug.
    - `Project ID fallback` when a numeric project ID is needed.
    - `Place ID` for reserve boundary-based feeds.

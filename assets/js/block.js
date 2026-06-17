@@ -31,14 +31,6 @@
 			perPage: {
 				type: 'number',
 				default: 100
-			},
-			title: {
-				type: 'string',
-				default: 'iNaturalist Observations'
-			},
-			summary: {
-				type: 'string',
-				default: 'Live observations from this reserve on iNaturalist.'
 			}
 		},
 		edit: function ( props ) {
@@ -53,20 +45,6 @@
 					el(
 						PanelBody,
 						{ title: 'iNaturalist Source' },
-						el( TextControl, {
-							label: 'Title',
-							value: attributes.title,
-							onChange: function ( value ) {
-								props.setAttributes( { title: value } );
-							}
-						} ),
-						el( TextControl, {
-							label: 'Summary',
-							value: attributes.summary,
-							onChange: function ( value ) {
-								props.setAttributes( { summary: value } );
-							}
-						} ),
 						el( TextControl, {
 							label: 'Project slug',
 							value: attributes.projectSlug,

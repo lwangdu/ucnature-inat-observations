@@ -42,8 +42,8 @@ function ucnature_inat_observations_activate() {
 		return;
 	}
 
-	$content = '<!-- wp:paragraph --><p>UC Natural Reserve System sites support remarkable biodiversity, and community science platforms like iNaturalist help document those living communities over time. This page highlights recent observations recorded for this reserve.</p><!-- /wp:paragraph -->';
-	$content .= "\n\n" . '<!-- wp:ucnature-inat/observations {"projectSlug":"stunt-ranch-santa-monica-mountains-reserve","projectId":3234,"perPage":100,"title":"iNaturalist Observations","summary":"Live observations from this reserve on iNaturalist."} /-->';
+	$content = '<!-- wp:paragraph --><p>UC Nature sites support remarkable biodiversity, and community science platforms like iNaturalist help document those living communities over time. This page highlights recent observations recorded for this reserve.</p><!-- /wp:paragraph -->';
+	$content .= "\n\n" . '<!-- wp:ucnature-inat/observations {"projectSlug":"stunt-ranch-santa-monica-mountains-reserve","projectId":3234,"perPage":100} /-->';
 
 	$page_id = wp_insert_post(
 		array(

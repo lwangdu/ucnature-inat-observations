@@ -69,11 +69,11 @@ final class UCNature_iNat_Observations_Renderer {
 					),
 					'title'       => array(
 						'type'    => 'string',
-						'default' => 'iNaturalist Observations',
+						'default' => '',
 					),
 					'summary'     => array(
 						'type'    => 'string',
-						'default' => 'Live observations from this reserve on iNaturalist.',
+						'default' => '',
 					),
 				),
 			)
@@ -117,8 +117,8 @@ final class UCNature_iNat_Observations_Renderer {
 				'place_id'     => $attributes['placeId'] ?? 0,
 				'user_id'      => $attributes['userId'] ?? '',
 				'per_page'     => $attributes['perPage'] ?? 100,
-				'title'        => $attributes['title'] ?? __( 'iNaturalist Observations', 'ucnature-inat-observations' ),
-				'summary'      => $attributes['summary'] ?? __( 'Live observations from this reserve on iNaturalist.', 'ucnature-inat-observations' ),
+				'title'        => $attributes['title'] ?? '',
+				'summary'      => $attributes['summary'] ?? '',
 			)
 		);
 	}
@@ -142,24 +142,31 @@ final class UCNature_iNat_Observations_Renderer {
 		$heading_id = wp_unique_id( 'ucnature-inat-heading-' );
 		$title      = sanitize_text_field( $args['title'] );
 		$summary    = sanitize_text_field( $args['summary'] );
+		$has_header = '' !== $title || '' !== $summary;
+		$labelledby = '' !== $title ? ' aria-labelledby="' . esc_attr( $heading_id ) . '"' : '';
+		$stats_title = '' !== $title ? $title : __( 'iNaturalist', 'ucnature-inat-observations' );
 		$stats      = is_wp_error( $data ) ? null : UCNature_iNat_Observations_Cache::get_source_stats( $query_args );
 
 		ob_start();
 		?>
-		<section class="ucnature-inat" aria-labelledby="<?php echo esc_attr( $heading_id ); ?>">
-			<div class="ucnature-inat__header">
-				<h2 id="<?php echo esc_attr( $heading_id ); ?>" class="ucnature-inat__title"><?php echo esc_html( $title ); ?></h2>
-				<?php if ( '' !== $summary ) : ?>
-					<p class="ucnature-inat__summary"><?php echo esc_html( $summary ); ?></p>
-				<?php endif; ?>
-			</div>
+		<section class="ucnature-inat"<?php echo $labelledby; ?>>
+			<?php if ( $has_header ) : ?>
+				<div class="ucnature-inat__header">
+					<?php if ( '' !== $title ) : ?>
+						<h2 id="<?php echo esc_attr( $heading_id ); ?>" class="ucnature-inat__title"><?php echo esc_html( $title ); ?></h2>
+					<?php endif; ?>
+					<?php if ( '' !== $summary ) : ?>
+						<p class="ucnature-inat__summary"><?php echo esc_html( $summary ); ?></p>
+					<?php endif; ?>
+				</div>
+			<?php endif; ?>
 			<?php $this->render_filters( $group ); ?>
 			<?php if ( is_wp_error( $data ) ) : ?>
 				<p class="ucnature-inat__notice"><?php echo esc_html( $data->get_error_message() ); ?></p>
 			<?php elseif ( empty( $data['results'] ) ) : ?>
 				<p class="ucnature-inat__notice"><?php esc_html_e( 'No observations found for this filter.', 'ucnature-inat-observations' ); ?></p>
 			<?php else : ?>
-				<?php $this->render_stats_cards( UCNature_iNat_Observations_Cache::displayed_stats( $data ), $stats, $title ); ?>
+				<?php $this->render_stats_cards( UCNature_iNat_Observations_Cache::displayed_stats( $data ), $stats, $stats_title ); ?>
 				<div class="ucnature-inat__grid">
 					<?php foreach ( $data['results'] as $observation ) : ?>
 						<?php include UCNATURE_INAT_PATH . 'templates/observation-card.php'; ?>
