@@ -1,17 +1,34 @@
 <?php
+/**
+ * Admin settings screen.
+ *
+ * @package UCNature_INat_Observations
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Handles settings registration and admin tools.
+ */
 final class UCNature_INat_Observations_Admin {
 	const OPTION_NAME = 'ucnature_inat_observations_options';
 
+	/**
+	 * Hook admin actions.
+	 */
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_options_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_post_ucnature_inat_clear_cache', array( $this, 'handle_clear_cache' ) );
 	}
 
+	/**
+	 * Get plugin options merged with defaults.
+	 *
+	 * @return array
+	 */
 	public static function get_options() {
 		$defaults = array(
 			'project_id'   => 3234,
@@ -26,6 +43,9 @@ final class UCNature_INat_Observations_Admin {
 		return wp_parse_args( is_array( $options ) ? $options : array(), $defaults );
 	}
 
+	/**
+	 * Add the settings page.
+	 */
 	public function add_options_page() {
 		add_options_page(
 			__( 'iNaturalist Observations', 'ucnature-inat-observations' ),
@@ -36,6 +56,9 @@ final class UCNature_INat_Observations_Admin {
 		);
 	}
 
+	/**
+	 * Register settings, sections, and fields.
+	 */
 	public function register_settings() {
 		register_setting(
 			'ucnature_inat_observations',
@@ -95,6 +118,12 @@ final class UCNature_INat_Observations_Admin {
 		);
 	}
 
+	/**
+	 * Sanitize settings.
+	 *
+	 * @param array $options Raw options.
+	 * @return array
+	 */
 	public function sanitize_options( $options ) {
 		$options = is_array( $options ) ? $options : array();
 
@@ -107,6 +136,9 @@ final class UCNature_INat_Observations_Admin {
 		);
 	}
 
+	/**
+	 * Render the project slug field.
+	 */
 	public function render_project_slug_field() {
 		$options = self::get_options();
 		?>
@@ -115,6 +147,9 @@ final class UCNature_INat_Observations_Admin {
 		<?php
 	}
 
+	/**
+	 * Render the project ID field.
+	 */
 	public function render_project_id_field() {
 		$options = self::get_options();
 		?>
@@ -123,6 +158,9 @@ final class UCNature_INat_Observations_Admin {
 		<?php
 	}
 
+	/**
+	 * Render the per-page field.
+	 */
 	public function render_per_page_field() {
 		$options = self::get_options();
 		?>
@@ -130,6 +168,9 @@ final class UCNature_INat_Observations_Admin {
 		<?php
 	}
 
+	/**
+	 * Render the cache TTL field.
+	 */
 	public function render_cache_ttl_field() {
 		$options = self::get_options();
 		?>
@@ -138,6 +179,9 @@ final class UCNature_INat_Observations_Admin {
 		<?php
 	}
 
+	/**
+	 * Render the external-link setting field.
+	 */
 	public function render_open_new_tab_field() {
 		$options = self::get_options();
 		?>
@@ -148,6 +192,9 @@ final class UCNature_INat_Observations_Admin {
 		<?php
 	}
 
+	/**
+	 * Clear cached iNaturalist data.
+	 */
 	public function handle_clear_cache() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'You do not have permission to clear this cache.', 'ucnature-inat-observations' ) );
@@ -169,18 +216,23 @@ final class UCNature_INat_Observations_Admin {
 		exit;
 	}
 
+	/**
+	 * Render the settings page.
+	 */
 	public function render_options_page() {
+		$cache_cleared = isset( $_GET['ucnature_cache_clear'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$cache_count   = isset( $_GET['ucnature_cache_count'] ) ? absint( wp_unslash( $_GET['ucnature_cache_count'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'iNaturalist Observations', 'ucnature-inat-observations' ); ?></h1>
-			<?php if ( isset( $_GET['ucnature_cache_clear'] ) ) : ?>
+			<?php if ( $cache_cleared ) : ?>
 				<div class="notice notice-success is-dismissible">
 					<p>
 						<?php
 						printf(
 							/* translators: %s: number of deleted cache records. */
 							esc_html__( 'iNaturalist cache cleared. Removed %s cache records.', 'ucnature-inat-observations' ),
-							esc_html( number_format_i18n( absint( wp_unslash( $_GET['ucnature_cache_count'] ?? 0 ) ) ) )
+							esc_html( number_format_i18n( $cache_count ) )
 						);
 						?>
 					</p>

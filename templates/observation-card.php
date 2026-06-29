@@ -1,4 +1,13 @@
 <?php
+/**
+ * Observation card template.
+ *
+ * @package UCNature_INat_Observations
+ *
+ * @var array $observation Observation data.
+ * @var bool  $open_links_in_new_tab Whether observation links open in a new tab.
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }

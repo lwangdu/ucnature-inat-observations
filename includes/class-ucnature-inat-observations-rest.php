@@ -1,13 +1,28 @@
 <?php
+/**
+ * REST API integration.
+ *
+ * @package UCNature_INat_Observations
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Registers REST endpoints for observation data.
+ */
 final class UCNature_INat_Observations_REST {
+	/**
+	 * Hook REST route registration.
+	 */
 	public function __construct() {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
 
+	/**
+	 * Register observation REST routes.
+	 */
 	public function register_routes() {
 		register_rest_route(
 			'ucnature-inat/v1',
@@ -62,6 +77,12 @@ final class UCNature_INat_Observations_REST {
 		);
 	}
 
+	/**
+	 * Get observations for a REST request.
+	 *
+	 * @param WP_REST_Request $request REST request.
+	 * @return WP_REST_Response|WP_Error
+	 */
 	public function get_observations( WP_REST_Request $request ) {
 		$data = UCNature_INat_Observations_Cache::get_observations(
 			array(

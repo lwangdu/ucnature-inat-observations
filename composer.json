@@ -14,7 +14,7 @@
 	},
 	"scripts": {
 		"lint:php": "find . -path './vendor' -prune -o -path './.git' -prune -o -name '*.php' -print -exec php -l {} \\;",
-		"lint:js": "node --check assets/js/block.js",
+		"lint:js": "node --check assets/js/block.js && node --check assets/js/map.js && node --check assets/js/view.js",
 		"phpcs": "phpcs --standard=WordPress-Core --extensions=php --ignore=vendor/* ."
 	}
 }
