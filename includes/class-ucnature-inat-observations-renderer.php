@@ -32,12 +32,14 @@ final class UCNature_INat_Observations_Renderer {
 		$block_js_path     = UCNATURE_INAT_PATH . 'assets/js/block.js';
 		$map_js_path       = UCNATURE_INAT_PATH . 'assets/js/map.js';
 		$view_js_path      = UCNATURE_INAT_PATH . 'assets/js/view.js';
+		$leaflet_css_path  = UCNATURE_INAT_PATH . 'assets/vendor/leaflet/leaflet.css';
+		$leaflet_js_path   = UCNATURE_INAT_PATH . 'assets/vendor/leaflet/leaflet.js';
 
 		wp_register_style(
 			'leaflet',
-			'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+			UCNATURE_INAT_URL . 'assets/vendor/leaflet/leaflet.css',
 			array(),
-			'1.9.4'
+			file_exists( $leaflet_css_path ) ? filemtime( $leaflet_css_path ) : '1.9.4'
 		);
 
 		wp_register_style(
@@ -49,9 +51,9 @@ final class UCNature_INat_Observations_Renderer {
 
 		wp_register_script(
 			'leaflet',
-			'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+			UCNATURE_INAT_URL . 'assets/vendor/leaflet/leaflet.js',
 			array(),
-			'1.9.4',
+			file_exists( $leaflet_js_path ) ? filemtime( $leaflet_js_path ) : '1.9.4',
 			true
 		);
 

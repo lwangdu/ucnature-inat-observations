@@ -10,6 +10,9 @@ Thumbs.db
 # WordPress/plugin build and dependency output
 node_modules/
 vendor/
+!assets/vendor/
+!assets/vendor/leaflet/
+!assets/vendor/leaflet/**
 build/
 dist/
 

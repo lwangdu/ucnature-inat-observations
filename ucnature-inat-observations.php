@@ -3,8 +3,11 @@
  * Plugin Name: UC Nature iNaturalist Observations
  * Description: Displays iNaturalist project observations in WordPress using cached API requests and a block editor interface.
  * Version: 0.2.1
+ * Requires at least: 6.5
+ * Requires PHP: 7.4
  * Author: Lobsang Wangdu
  * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: ucnature-inat-observations
  *
  * @package UCNature_INat_Observations
@@ -59,7 +62,7 @@ function ucnature_inat_observations_maybe_create_pages() {
 }
 
 /**
- * Create starter observation pages.
+ * Create starter observation pages as drafts.
  */
 function ucnature_inat_observations_create_default_pages() {
 	ucnature_inat_observations_create_page(
@@ -103,7 +106,7 @@ function ucnature_inat_observations_create_page( $option_name, $slug, $title, $c
 			'post_title'   => $title,
 			'post_name'    => $slug,
 			'post_content' => $content,
-			'post_status'  => 'publish',
+			'post_status'  => 'draft',
 			'post_type'    => 'page',
 		),
 		true
